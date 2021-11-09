@@ -6,16 +6,18 @@ notesRouter.get('/', async (request, response) => {
   response.json(allNotes)
 })
 
-notesRouter.get('/:id', (request, response, next) => {
-  Note.findById(request.params.id)
-    .then(note => {
-      if (note) {
-        response.json(note)
-      } else {
-        response.status(404).end()
-      }
-    })
-    .catch(error => next(error))
+
+notesRouter.get('/:id', async (request, response, next) => {
+  try{
+    const note = await Note.findById(request.params.id)
+    if (note) {
+      response.json(note)
+    } else {
+      response.status(404).end()
+    }
+  } catch(exception) {
+    next(exception)
+  }
 })
 
 
@@ -52,13 +54,19 @@ notesRouter.post('/', async (request, response, next) => {
 })
 
 
-notesRouter.delete('/:id', (request, response, next) => {
-  Note.findByIdAndRemove(request.params.id)
-    .then(() => {
-      response.status(204).end()
-    })
-    .catch(error => next(error))
+
+
+
+
+notesRouter.delete('/:id', async (request, response) => {
+  await Note.findByIdAndRemove(request.params.id)
+  response.status(204).end()
 })
+
+
+
+
+
 
 notesRouter.put('/:id', (request, response, next) => {
   const body = request.body
